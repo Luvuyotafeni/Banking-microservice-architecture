@@ -33,6 +33,12 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendRejectionEmail(String toEmail, String userName, String reason) {
+        log.info("Sending rejection email to: {}", toEmail);
+
+        String subject = "Banking Account registration update";
+        String body = buildRejectionEmailBody(userName, reason);
+
+        sendEmail(toEmail, subject, body);
 
     }
 
@@ -73,6 +79,19 @@ public class EmailServiceImpl implements EmailService {
                 </body>
                 </html>
                 """, userName, otp
+        );
+    }
+
+    private String buildRejectionEmailBody(String userName, String reason){
+        return String.format("""
+                <!DOCTYPE html>
+                <html>
+                <head>
+                </head>
+                <body>
+                </body>
+                </html>
+                """, userName, reason
         );
     }
 }
