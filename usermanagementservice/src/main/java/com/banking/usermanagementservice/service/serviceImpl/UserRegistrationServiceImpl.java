@@ -9,6 +9,7 @@ import com.banking.usermanagementservice.enums.ApprovalStatus;
 import com.banking.usermanagementservice.enums.RoleType;
 import com.banking.usermanagementservice.exception.DuplicateResourceException;
 import com.banking.usermanagementservice.exception.ResourceNotFoundException;
+import com.banking.usermanagementservice.mapper.UserMapper;
 import com.banking.usermanagementservice.repository.RoleRepository;
 import com.banking.usermanagementservice.repository.UserRepository;
 import com.banking.usermanagementservice.service.EncryptionService;
@@ -27,6 +28,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final EncryptionService encryptionService;
+    private final UserMapper userMapper;
 
 
     @Override
