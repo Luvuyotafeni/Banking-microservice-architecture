@@ -44,6 +44,12 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendPasswordResetEmail(String toEmail, String userName, String resetToken) {
+        log.info("Sending password reset email to: {}", toEmail);
+
+        String subject = " Password reset request";
+        String body = buildPasswordRestEmailBody(userName, resetToken);
+
+        sendEmail(toEmail, subject, body);
 
     }
 
@@ -92,6 +98,19 @@ public class EmailServiceImpl implements EmailService {
                 </body>
                 </html>
                 """, userName, reason
+        );
+    }
+
+    private String buildPasswordRestEmailBody(String userName, String resetToken){
+        return String.format("""
+                <!DOCTYPE html>
+                <html>
+                <head>
+                </head>
+                <body>
+                </body>
+                </html>
+                """, userName, resetToken
         );
     }
 }
