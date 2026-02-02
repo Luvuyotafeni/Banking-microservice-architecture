@@ -92,11 +92,12 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
 
     @Override
     public boolean emailExists(String email) {
-        return false;
+        return userRepository.existsByEmail(email.toLowerCase());
     }
 
     @Override
     public boolean idNumberExists(String idNumber) {
-        return false;
+        String encryptedIdNumber = encryptionService.encrypt(idNumber);
+        return userRepository.existsByIdNumber(encryptedIdNumber);
     }
 }
