@@ -19,7 +19,7 @@ public class UserApprovalRequest {
     private UUID userId;
 
     @NotNull(message = "Approval decision is required")
-    private boolean approved;
+    private Boolean approved;
 
     @NotBlank(message = "Reason is required")
     private String reason;
