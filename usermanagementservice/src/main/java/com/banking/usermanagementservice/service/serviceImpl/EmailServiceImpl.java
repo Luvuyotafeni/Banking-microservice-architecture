@@ -56,6 +56,12 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendPasswordExpirationWarning(String toEmail, String userName, int daysRemaining) {
 
+        log.info("Sending password expiration warning to: {}", toEmail);
+
+        String subject = "Password Expiration Notice";
+        String body = buildPasswordExpirationEmailBody(userName, daysRemaining);
+
+        sendEmail(toEmail, subject, body);
     }
 
     private void sendEmail(String to, String subject, String body){
@@ -111,6 +117,19 @@ public class EmailServiceImpl implements EmailService {
                 </body>
                 </html>
                 """, userName, resetToken
+        );
+    }
+
+    private String buildPasswordExpirationEmailBody(String userName, int daysRemaining){
+        return String.format("""
+                <!DOCTYPE html>
+                <html>
+                <head>
+                </head>
+                <body>
+                </body>
+                </html>
+                """, userName, daysRemaining
         );
     }
 }
