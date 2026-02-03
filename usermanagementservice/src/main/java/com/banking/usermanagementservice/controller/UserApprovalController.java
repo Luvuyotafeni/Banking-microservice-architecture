@@ -6,10 +6,9 @@ import com.banking.usermanagementservice.dto.UserResponse;
 import com.banking.usermanagementservice.service.UserApprovalService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +23,7 @@ public class UserApprovalController {
     private final UserApprovalService userApprovalService;
 
     @PostMapping("/process")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<UserResponse>> processApproval(
             @Valid @RequestBody UserApprovalRequest request,
             @RequestAttribute("userId")UUID adminUserId
@@ -40,6 +40,7 @@ public class UserApprovalController {
     }
 
     @GetMapping("/pending")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<List<UserResponse>>> getPendingApprovals(){
         log.info("Fetching all pending approvals");
 
@@ -54,6 +55,7 @@ public class UserApprovalController {
     }
 
     @GetMapping("/{userId}")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<UserResponse>> getUserForApproval(@PathVariable UUID userId) {
         log.info("Fetching user {} for approval review", userId);
 
