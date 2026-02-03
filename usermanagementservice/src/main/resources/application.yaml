@@ -40,6 +40,14 @@ app:
     id-number: ${SUPER_ADMIN_ID:9999999999999}
     initial-password: ${SUPER_ADMIN_PASSWORD:SuperAdmin@123}
 
+  security:
+    jwt:
+      secret: ${JWT_SECRET:your-secret-key-should-be-at-least-256-bits-long-for-hs256-algorithm}
+      expiration: 86400000 # 24 hours in milliseconds
+      refresh-expiration: 604800000 # 7 days
+    password:
+      expiration-days: 90
+
   otp:
     length: 6
     expiration-minutes: 15

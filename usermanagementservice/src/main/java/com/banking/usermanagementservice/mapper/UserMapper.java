@@ -18,6 +18,10 @@ public interface UserMapper {
     @Mapping(target = "fullName", source = ".", qualifiedByName = "getFullName")
     @Mapping(target = "roles", source = "roles", qualifiedByName = "mapRolesToStrings")
     @Mapping(target = "address", source = "address")
+// MapStruct sees isActive() and identifies the property as "active"
+    @Mapping(target = "isActive", source = "active")
+// MapStruct sees isEmailVerified() and identifies the property as "emailVerified"
+    @Mapping(target = "isEmailVerified", source = "emailVerified")
     UserResponse toUserResponse(User user);
 
     @Mapping(target = "formattedAddress", source = ".", qualifiedByName = "getFormattedAddress")

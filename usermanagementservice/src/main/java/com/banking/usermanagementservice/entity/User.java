@@ -67,7 +67,7 @@ public class User {
 
     @Column(nullable = false)
     @Builder.Default
-    private Boolean isActive = false;
+    private boolean isActive = false;
 
     @Column(nullable = false)
     @Builder.Default
