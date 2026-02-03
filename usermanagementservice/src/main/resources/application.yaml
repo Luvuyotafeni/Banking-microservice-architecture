@@ -16,21 +16,21 @@ spring:
         hibernate:
           dialect: org.hibernate.dialect.MySQLDialect
 
-    mail:
-      host: ${MAIL_HOST:smtp.gmail.com}
-      port: ${MAIL_PORT:587}
-      username: ${MAIL_USERNAME:luvuyotafeni012@gmail.com}
-      password: ${MAIL_PASWORD:djkbsnnssd}
-      properties:
-        mail:
-          smtp:
-            auth: true
-            smartlls:
-              enable: true
-              required: true
-            connectiontimeout: 5000
-            timeout: 5000
-            writetimeout: 5000
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:luvuyotafeni012@gmail.com}
+    password: ${MAIL_PASWORD:djkbsnnssd}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          startlls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
 
 app:
   super-admin:
@@ -39,3 +39,7 @@ app:
     last-name: ${SUPER_ADMIN_LASTNAME:Admin}
     id-number: ${SUPER_ADMIN_ID:9999999999999}
     initial-password: ${SUPER_ADMIN_PASSWORD:SuperAdmin@123}
+
+  otp:
+    length: 6
+    expiration-minutes: 15

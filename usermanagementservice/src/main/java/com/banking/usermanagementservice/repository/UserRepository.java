@@ -31,6 +31,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("SELECT u FROM User u WHERE u.email = :email AND u.isDeleted = false")
     Optional<User> findByEmailAndNotDeleted(@Param("email") String email);
 
-    @Query("SELECT u FROM User u JOIN u.roles WHERE r.name = :roleName AND u.isDeleted = false")
+    @Query("SELECT u FROM User u JOIN u.roles r WHERE r.name = :roleName AND u.isDeleted = false")
     Optional<User> findByRoleName(@Param("roleName") String roleName);
 }

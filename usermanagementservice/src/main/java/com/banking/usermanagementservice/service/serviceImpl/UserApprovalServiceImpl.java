@@ -50,7 +50,7 @@ public class UserApprovalServiceImpl implements UserApprovalService {
             user.setApprovedBy(approvedBy);
             user.setIsActive(true);
 
-            //genertion of the otp
+            //generation of the otp
             String otp = otpService.generateOtp(user.getId());
 
             //save user
