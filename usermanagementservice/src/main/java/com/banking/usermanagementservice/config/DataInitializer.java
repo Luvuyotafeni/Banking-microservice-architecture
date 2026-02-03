@@ -58,6 +58,11 @@ public class DataInitializer implements CommandLineRunner {
         //initialize roles
         initializeRoles();
 
+        intializeSuperAdmin();
+
+        log.info("Data initialization completed successfully");
+
+
     }
 
     private void initializeRoles(){
