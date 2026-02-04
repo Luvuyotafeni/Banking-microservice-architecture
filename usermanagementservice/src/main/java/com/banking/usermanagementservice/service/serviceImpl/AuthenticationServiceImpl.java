@@ -242,11 +242,78 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void confirmPasswordReset(PasswordResetConfirmRequest request) {
 
+        log.info("Password reset confirmation with token");
+
+        //validate password match
+        if (!request.getNewPassword().equals(request.getConfirmPassword())){
+            throw new InvalidOperationException("Password do not match");
+        }
+
+        // Find credentials by valid token
+        UserCredentials credentials = credentialsRepository.findByValidPasswordResetToken(request.getToken())
+                .orElseThrow(()-> new InvalidOperationException("Invalid or expired reset token"));
+
+        //Hash and set new password
+        String hashedPassword = passwordEncoder.encode(request.getNewPassword());
+        credentials.setPasswordHash(hashedPassword);
+        credentials.setPasswordCreatedAt(LocalDateTime.now());
+        credentials.setPasswordExpiresAt(LocalDateTime.now().plusDays(passwordExpirationDays));
+        credentials.setPasswordResetToken(null);
+        credentials.setPasswordResetTokenExpiresAt(null);
+        credentials.resetFailedAttemps();
+
+        credentialsRepository.save(credentials);
+
+        log.info("Password reset successfully for user: {}", credentials.getUserId());
     }
 
     @Override
     public AuthenticationResponse refreshToken(RefreshToken request) {
-        return null;
+        log.info("Token refresh requested");
+
+        try {
+            String refreshToken = request.getRefreshToken();
+
+            if (!jwtTokenProvider.isRefreshToken(refreshToken)){
+                throw new InvalidOperationException("Invalid refresh token");
+            }
+
+            if (jwtTokenProvider.isTokenExpired(refreshToken)){
+                throw new InvalidOperationException("Refresh token has expired");
+            }
+
+            String email = jwtTokenProvider.extractUsername(refreshToken);
+            UUID userId = jwtTokenProvider.extractUserId(refreshToken);
+
+            User user = userRepository.findByIdAndNotDeleted(userId)
+                    .orElseThrow(()-> new InvalidOperationException("User not found"));
+
+            if (!user.isActive()){
+                throw new InvalidOperationException("User account is not active.");
+            }
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
+            String newAccessToken = jwtTokenProvider.generateToken(userDetails, userId);
+
+            log.info("Token refreshed successfully for user: {}", email);
+
+            return AuthenticationResponse.builder()
+                    .accessToken(newAccessToken)
+                    .refreshToken(refreshToken)
+                    .tokenType("Bearer")
+                    .expiresIn(jwtExpiration)
+                    .userId(user.getId())
+                    .email(user.getEmail())
+                    .fullname(user.getFullName())
+                    .roles(user.getRoles().stream()
+                            .map(role -> role.getName().name())
+                            .collect(Collectors.toSet()))
+                    .build();
+        } catch (Exception e){
+            log.error("Token refresh failed", e);
+            throw new InvalidOperationException("Invalid refresh token");
+        }
     }
 
     @Override
