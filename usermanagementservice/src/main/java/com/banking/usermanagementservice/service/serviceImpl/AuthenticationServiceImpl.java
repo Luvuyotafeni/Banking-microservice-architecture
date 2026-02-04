@@ -237,6 +237,37 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void requestPasswordReset(PasswordResetRequest request) {
 
+        log.info("Password reset requested for email: {}", request.getEmail());
+
+        //find user (don't reveal if user exists for security
+        User user = userRepository.findByEmailAndNotDeleted(request.getEmail().toLowerCase())
+                .orElse(null);
+
+        if (user == null){
+            log.warn("Password reset requested for non-existent email: {}", request.getEmail());
+            return;
+        }
+
+        //Get creds
+        UserCredentials credentials = credentialsRepository.findByUserId(user.getId())
+                .orElse(null);
+
+        if (credentials == null){
+            log.warn("No credentials found for user: {}", user.getId());
+            return;
+        }
+
+        //Generate reset token
+        String resetToken = UUID.randomUUID().toString();
+        credentials.setPasswordResetToken(resetToken);
+        credentials.setPasswordResetTokenExpiresAt(LocalDateTime.now().plusHours(1));
+
+        credentialsRepository.save(credentials);
+
+        emailService.sendPasswordResetEmail(user.getEmail(),user.getFullName(), resetToken);
+
+        log.info("Password reset email sent to: {}", request.getEmail());
+
     }
 
     @Override
