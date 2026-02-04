@@ -15,6 +15,7 @@ import com.banking.usermanagementservice.service.OtpService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -232,6 +233,38 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void changePassword(UUID userId, String currentPassword, PasswordChangeRequest request) {
 
+        log.info("Password change for user: {}", userId);
+
+        //validate passwords match
+        if (!request.getNewPassword().equals(request.getConfirmPassword())){
+            throw new InvalidOperationException("Password do not match");
+        }
+
+        //Get credentials
+        UserCredentials userCredentials = credentialsRepository.findByUserId(userId)
+                .orElseThrow(()-> new ResourceNotFoundException("User credentials not found"));
+
+        //validation of current password
+
+        if (!passwordEncoder.matches(currentPassword, userCredentials.getPasswordHash())) {
+            throw new InvalidOperationException("Current password is incorrect");
+        }
+
+        //check if new password is same as old
+        if (passwordEncoder.matches(request.getNewPassword(), userCredentials.getPasswordHash())){
+            throw new InvalidOperationException("New password nust be different from current password");
+        }
+
+        //Hash and set new password
+
+        String hashedPassword = passwordEncoder.encode(request.getNewPassword());
+        userCredentials.setPasswordHash(hashedPassword);
+        userCredentials.setPasswordCreatedAt(LocalDateTime.now());
+        userCredentials.setPasswordExpiresAt(LocalDateTime.now().plusDays(passwordExpirationDays));
+
+        credentialsRepository.save(userCredentials);
+
+        log.info("Password changed successfully for user: {}", userId);
     }
 
     @Override
