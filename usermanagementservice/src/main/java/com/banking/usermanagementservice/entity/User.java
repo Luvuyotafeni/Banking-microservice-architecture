@@ -65,6 +65,16 @@ public class User {
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_beneficiaries",
+            joinColumns = @JoinColumn(name = "userId"),
+            inverseJoinColumns = @JoinColumn(name = "beneficiary_id")
+    )
+    @Builder.Default
+    private Set<Beneficiaries> beneficiaries = new HashSet<>();
+
     @Column(nullable = false)
     @Builder.Default
     private boolean isActive = false;
@@ -76,6 +86,16 @@ public class User {
     @Column(nullable = false)
     @Builder.Default
     private boolean isDeleted = false;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean isSuspended = false;
+
+    @Column
+    private String suspensionReason;
+
+    @Column
+    private LocalDateTime suspendedAt;
 
     @CreationTimestamp
     @Column(nullable = false)
@@ -96,6 +116,16 @@ public class User {
     public void removeRole(Role role){
         this.roles.remove(role);
         role.getUsers().remove(this);
+    }
+
+    public void addBeneficiary(Beneficiaries beneficiary){
+        this.beneficiaries.add(beneficiary);
+        beneficiary.getUsers().add(this);
+    }
+
+    public void removeBeneficiary(Beneficiaries beneficiaries){
+        this.beneficiaries.remove(beneficiaries);
+        beneficiaries.getUsers().remove(this);
     }
 
     public String getFullName() {
