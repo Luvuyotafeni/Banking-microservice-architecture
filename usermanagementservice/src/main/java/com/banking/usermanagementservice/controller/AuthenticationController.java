@@ -38,7 +38,7 @@ public class AuthenticationController {
     }
 
     /**
-     * login with ottp*/
+     * login with otp*/
     @PostMapping("/login/otp")
     public ResponseEntity<ApiResponse<AuthenticationResponse>> loginWithOtp(
             @Valid @RequestBody OtpLoginRequest request

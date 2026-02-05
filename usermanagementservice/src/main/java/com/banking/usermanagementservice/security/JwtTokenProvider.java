@@ -72,7 +72,7 @@ public class JwtTokenProvider {
                 .setSubject(subject)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(getSigninKey(), SignatureAlgorithm.ES256)
+                .signWith(getSigninKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
