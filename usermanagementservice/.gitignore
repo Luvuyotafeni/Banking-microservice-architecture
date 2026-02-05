@@ -14,7 +14,7 @@ target/
 .sts4-cache
 
 ### Secrets ###
-.env
+*.env
 .env.local
 
 ### IntelliJ IDEA ###
