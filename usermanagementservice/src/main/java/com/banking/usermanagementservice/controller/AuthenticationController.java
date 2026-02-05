@@ -52,6 +52,8 @@ public class AuthenticationController {
 
     }
 
+    //
+
     /**
      * Change password after first login (requires authentication)*/
 
@@ -110,10 +112,11 @@ public class AuthenticationController {
 
     /**
      * Confirm password reset with toke (public endpoint)*/
-    @PostMapping ResponseEntity<ApiResponse<Void>> confirmPasswordReset(
+    @PostMapping("/password/reset-confirm")
+    ResponseEntity<ApiResponse<Void>> confirmPasswordReset(
             @Valid @RequestBody PasswordResetConfirmRequest request
     ){
-        log.info("Password reset confirmartion with token");
+        log.info("Password reset confirmation with token");
 
         authenticationService.confirmPasswordReset(request);
 
