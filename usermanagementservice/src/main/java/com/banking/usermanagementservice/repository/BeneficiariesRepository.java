@@ -4,11 +4,13 @@ import com.banking.usermanagementservice.entity.Beneficiaries;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Repository
 public interface BeneficiariesRepository extends JpaRepository<Beneficiaries, UUID> {
 
     Optional<Beneficiaries> findByAccountId(String accountId);

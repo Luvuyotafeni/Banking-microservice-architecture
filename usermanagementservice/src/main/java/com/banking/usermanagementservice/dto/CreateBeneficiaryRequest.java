@@ -14,4 +14,6 @@ public class CreateBeneficiaryRequest {
 
     @NotBlank(message = "Account Id is required")
     private String accountId;
+
+    private String nickname;
 }
