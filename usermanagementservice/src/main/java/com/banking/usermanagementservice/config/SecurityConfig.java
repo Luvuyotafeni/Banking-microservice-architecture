@@ -60,7 +60,9 @@ public class SecurityConfig {
                                 "/auth/refresh",
                                 "/auth/password/reset-request",
                                 "/auth/password/reset-confirm",
-                                "/actuator/**"
+                                "/actuator/**",
+                                "/profile/**",
+                                "/beneficiaries/**"
                         ).permitAll()
                         .requestMatchers("/admin/**").hasRole("SUPER_ADMIN")
                         .anyRequest().authenticated()
