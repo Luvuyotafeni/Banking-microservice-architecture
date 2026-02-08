@@ -65,7 +65,7 @@ public class Transaction {
     private LocalDateTime transactionDate;
 
     @Column(length = 500)
-    private String Description;
+    private String description;
 
     @Column(length = 100, unique = true)
     private String reference;

@@ -5,10 +5,8 @@ import com.banking.paymentService.dto.request.UpdateTransactionStatusRequest;
 import com.banking.paymentService.dto.response.TransactionResponse;
 import com.banking.paymentService.dto.response.TransactionSummaryResponse;
 import com.banking.paymentService.enums.TransactionType;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,12 +27,12 @@ public interface TransactionService {
     Page<TransactionResponse> getUserTransactionByDateRange(UUID userId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
 
     Page<TransactionResponse> searchTransactions(
-            UUID userId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable
+            UUID userId, LocalDateTime startDate, String seacrchTerm, Pageable pageable
     );
 
     TransactionSummaryResponse getTransactionSummary(UUID userId);
 
-    Page<TransactionResponse> updateTransactionStatus(
+    TransactionResponse updateTransactionStatus(
             UUID transactionId, UpdateTransactionStatusRequest request
     );
 
