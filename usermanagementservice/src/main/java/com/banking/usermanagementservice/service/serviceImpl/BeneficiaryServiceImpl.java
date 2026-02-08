@@ -14,6 +14,7 @@ import com.banking.usermanagementservice.service.BeneficiariesService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -65,6 +66,7 @@ public class BeneficiaryServiceImpl implements BeneficiariesService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BeneficiaryResponse getBeneficiaryById(UUID beneficiaryId) {
         log.info("Fetching beneficiary with Id:{}", beneficiaryId);
 
@@ -75,6 +77,7 @@ public class BeneficiaryServiceImpl implements BeneficiariesService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BeneficiaryResponse> getAllBeneficiaries() {
         log.info("Fetching all beneficiaries");
 
@@ -84,6 +87,7 @@ public class BeneficiaryServiceImpl implements BeneficiariesService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BeneficiaryResponse> getAllActiveBeneficiaries() {
         log.info("Fetching all active beneficiaries");
 
@@ -93,6 +97,7 @@ public class BeneficiaryServiceImpl implements BeneficiariesService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BeneficiaryResponse> getBeneficiariesByUserId(UUID userId) {
         log.info("Fetching beneficiaris for user Id {}", userId);
 
@@ -107,6 +112,7 @@ public class BeneficiaryServiceImpl implements BeneficiariesService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BeneficiaryResponse> getActiveBeneficiariesByUserId(UUID userId) {
         log.info("Fetching active beneficiaries for user with Id {}", userId);
 
@@ -224,13 +230,24 @@ public class BeneficiaryServiceImpl implements BeneficiariesService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public void verifyBeneficiaryOwnership(UUID userId, UUID beneficiaryId) {
 
+        log.info("Verifying beneficiary {} ownership for user {}", beneficiaryId, userId);
+
+        if (!beneficiariesRepository.existsByIdAndUserId(beneficiaryId, userId)) {
+            throw new ResourceNotFoundException("You do not have access to this beneficiary");
+        }
     }
 
     @Override
     public UUID getUserIdByEmail(String email) {
-        return null;
+        log.info("Fetching userId for email: {}", email);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User with email: "+ email + "not found"));
+
+        return user.getId();
     }
 
 
