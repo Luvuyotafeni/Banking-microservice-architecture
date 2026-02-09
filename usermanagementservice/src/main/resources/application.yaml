@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: usermanagementservice
+
+    datasource:
+      url: dbc:mysql://localhost:3306/fnb_intelligent_bank_usermanagement
+      username: root
+      password: 1234
+      driver-class-name: com.mysql.cj.jdbc.Driver
+
+
+    jpa:
+      hibernate:
+        ddl-auto: update
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.MySQLDialect
+
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+app:
+  super-admin:
+    email: ${SUPER_ADMIN_EMAIL:admin@banking.com}
+    first-name: ${SUPER_ADMIN_FIRSTNAME:super}
+    last-name: ${SUPER_ADMIN_LASTNAME:Admin}
+    id-number: ${SUPER_ADMIN_ID:9999999999999}
+    initial-password: ${SUPER_ADMIN_PASSWORD:SuperAdmin@123}
+
+  security:
+    jwt:
+      secret: ${JWT_SECRET}
+      expiration: 86400000 # 24 hours in milliseconds
+      refresh-expiration: 604800000 # 7 days
+    password:
+      expiration-days: 90
+
+  otp:
+    length: 6
+    expiration-minutes: 15
