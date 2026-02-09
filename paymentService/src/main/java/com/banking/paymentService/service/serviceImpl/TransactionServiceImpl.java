@@ -243,10 +243,10 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<TransactionResponse> searchTransactions(UUID userId, LocalDateTime startDate, String seacrchTerm, Pageable pageable) {
-        log.info("Searching transactions for user: {} with term: {}", userId, seacrchTerm);
+    public Page<TransactionResponse> searchTransactions(UUID userId, LocalDateTime startDate, String searchTerm, Pageable pageable) {
+        log.info("Searching transactions for user: {} with term: {}", userId, searchTerm);
 
-        return transactionRepository.searchByUserId(userId, seacrchTerm, pageable)
+        return transactionRepository.searchByUserId(userId, searchTerm, pageable)
                 .map(this::mapToResponse);
     }
 

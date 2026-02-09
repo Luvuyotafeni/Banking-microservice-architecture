@@ -27,7 +27,7 @@ public interface TransactionService {
     Page<TransactionResponse> getUserTransactionByDateRange(UUID userId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
 
     Page<TransactionResponse> searchTransactions(
-            UUID userId, LocalDateTime startDate, String seacrchTerm, Pageable pageable
+            UUID userId, LocalDateTime startDate, String searchTerm, Pageable pageable
     );
 
     TransactionSummaryResponse getTransactionSummary(UUID userId);
