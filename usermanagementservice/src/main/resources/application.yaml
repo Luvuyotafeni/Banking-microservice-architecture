@@ -19,8 +19,8 @@ spring:
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:luvuyotafeni012@gmail.com}
-    password: ${MAIL_PASWORD:wpfi vgmn mkll pbid}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASWORD:}
     properties:
       mail:
         smtp:
@@ -42,7 +42,7 @@ app:
 
   security:
     jwt:
-      secret: ${JWT_SECRET:aTf8J9rGh3qLm5Nz7XcVbQeSdFg6KjHyUiOp2WsE}
+      secret: ${JWT_SECRET}
       expiration: 86400000 # 24 hours in milliseconds
       refresh-expiration: 604800000 # 7 days
     password:
