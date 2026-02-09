@@ -5,6 +5,7 @@ import com.banking.paymentService.config.KafkaConfig;
 import com.banking.paymentService.config.KafkaTopicConfig;
 import com.banking.paymentService.dto.event.TransactionNotification;
 import com.banking.paymentService.dto.request.BalanceCheckRequest;
+import com.banking.paymentService.dto.request.CreditAccountRequest;
 import com.banking.paymentService.dto.request.DebitAccountRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -42,6 +43,25 @@ public class TransactionEventProducer {
         kafkaTemplate.send(KafkaTopicConfig.CREDIT_ACCOUNT_REQUEST, transaction.getReference(), request);
 
 
+    }
+
+    /**
+     * Send credit account request to Banking Service
+     */
+    public void sendCreditAccountRequest(Transaction transaction) {
+        CreditAccountRequest request = CreditAccountRequest.builder()
+                .accountId(transaction.getDestinationAccountId() != null
+                        ? transaction.getDestinationAccountId()
+                        : transaction.getAccountId())
+                .userId(transaction.getUserId())
+                .amount(transaction.getAmount())
+                .transactionReference(transaction.getReference())
+                .description(transaction.getDescription())
+                .build();
+
+//        log.info("Sending credit account request for transaction: {}", transaction.getReference());
+        kafkaTemplate.send(KafkaTopicConfig.CREDIT_ACCOUNT_REQUEST,
+                transaction.getReference(), request);
     }
 
     public void sendTransactionNotification(Transaction transaction){

@@ -7,6 +7,7 @@ import com.banking.paymentService.dto.response.TransactionSummaryResponse;
 import com.banking.paymentService.enums.TransactionType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,6 +26,10 @@ public interface TransactionService {
     Page<TransactionResponse> getUserTransactionByType(UUID userId, TransactionType type, Pageable pageable);
 
     Page<TransactionResponse> getUserTransactionByDateRange(UUID userId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+
+    @Transactional(readOnly = true)
+    Page<TransactionResponse> getUserTransactionsByDateRange(
+            UUID userId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
 
     Page<TransactionResponse> searchTransactions(
             UUID userId, String searchTerm, Pageable pageable
