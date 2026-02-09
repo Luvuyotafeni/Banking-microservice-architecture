@@ -1,9 +1,10 @@
 package com.banking.paymentService.dto.request;
 
 import lombok.*;
-import org.hibernate.validator.constraints.UUID;
+
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 
 @Getter
@@ -15,7 +16,7 @@ public class DebitAccountRequest {
 
     private String accountId;
     private UUID userId;
-    private BigDecimal requiredAmount;
+    private BigDecimal amount;
     private String transactionReference;
     private String description;
 }
