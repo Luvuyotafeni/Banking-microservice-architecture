@@ -36,8 +36,8 @@ management:
 
 # JWT Configuration (shared with user-management-service)
 jwt:
-  secret: your-super-secret-jwt-key-that-should-be-at-least-256-bits-long-for-hs256
-  expiration: 86400000 # 24 hours in milliseconds
+  secret: ${JWT_SECRET:aTf8J9rGh3qLm5Nz7XcVbQeSdFg6KjHyUiOp2WsE}
+  expiration: 86400000
 
 # Payment Service Configuration
 payment:

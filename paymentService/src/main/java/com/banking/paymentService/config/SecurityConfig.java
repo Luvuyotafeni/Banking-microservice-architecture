@@ -31,11 +31,11 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health").permitAll()
 
                         // Super Admin only endpoints
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/transactions/*/status").hasRole("SUPER_ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/transactions/*/cancel").hasRole("SUPER_ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/transactions/*/reverse").hasRole("SUPER_ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/transactions/pending").hasRole("SUPER_ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/transactions/process-stale").hasRole("SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/admin/transactions/*/status").hasRole("SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/admin/transactions/*/cancel").hasRole("SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/admin/transactions/*/reverse").hasRole("SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/admin/transactions/pending").hasRole("SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/admin/transactions/process-stale").hasRole("SUPER_ADMIN")
 
                         // All other endpoints require authentication
                         .anyRequest().authenticated()

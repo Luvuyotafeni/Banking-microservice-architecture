@@ -29,17 +29,19 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
 
     Page<Transaction> findByUserIdAndType(UUID userId, TransactionType type, Pageable pageable);
 
-    @Query("SELECT t FROM Transaction t WHERE t.userId == :userId " +
-    "AND t.transactionDate BETWEEN :startDate AND :endDate" +
-    "ORDER BY t.transactionDate DESC")
+    // FIX 1: Changed == to = and added space before ORDER BY
+    @Query("SELECT t FROM Transaction t WHERE t.userId = :userId " +
+            "AND t.transactionDate BETWEEN :startDate AND :endDate " +
+            "ORDER BY t.transactionDate DESC")
     Page<Transaction> findByUserIdAndDateRange(
             @Param("userId") UUID userId,
-            @Param("startDate")LocalDateTime startDate,
+            @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate,
             Pageable pageable
-            );
+    );
 
-    Page<Transaction> finByStatus(TransactionStatus status, Pageable pageable);
+    // FIX 2: Fixed typo finBy -> findBy
+    Page<Transaction> findByStatus(TransactionStatus status, Pageable pageable);
 
     List<Transaction> findByStatusAndCreatedAtBefore(
             TransactionStatus status,
@@ -47,7 +49,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     );
 
     @Query("SELECT COUNT(t) FROM Transaction t WHERE t.userId = :userId " +
-    "AND t.status = :status AND t.transactionDate >= :startDate")
+            "AND t.status = :status AND t.transactionDate >= :startDate")
     Long countByUserIdAndStatusANdDateAfter(
             @Param("userId") UUID userId,
             @Param("status") TransactionStatus status,
@@ -55,24 +57,26 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     );
 
     @Query("SELECT SUM(t.amount) FROM Transaction t WHERE t.userId = :userId "+
-    "AND t.status = 'COMPLETED' AND t.type = :type "+
-    "AND t.transactionDate >= :startDate")
+            "AND t.status = 'COMPLETED' AND t.type = :type "+
+            "AND t.transactionDate >= :startDate")
     BigDecimal sumCompletedAmountByUserIdAndTypeAndDateAfter(
             @Param("userId") UUID userId,
             @Param("type") TransactionType type,
             @Param("startDate") LocalDateTime startDate
     );
 
-    @Query("SELECT t FROM Transaction t WHERE t.userId = :userId AND "+
-    "(LOWER(t.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-    "(LOWER(t.reference) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
+    // FIX 3: Removed the extra '(' before LOWER and ensured spaces
+    @Query("SELECT t FROM Transaction t WHERE t.userId = :userId AND " +
+            "(LOWER(t.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+            "LOWER(t.reference) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
     Page<Transaction> searchByUserId(
             @Param("userId") UUID userId,
             @Param("searchTerm") String searchTerm,
             Pageable pageable
     );
 
-    @Query("SELECT t FROM Transaction WHERE t.status IN ('PENDING', 'PROCESSING')"+
-    "AND t.createdAt < :threshold")
+    // FIX 4: Added alias 't' after 'Transaction'
+    @Query("SELECT t FROM Transaction t WHERE t.status IN ('PENDING', 'PROCESSING') " +
+            "AND t.createdAt < :threshold")
     List<Transaction> findStaleTransactions(@Param("threshold") LocalDateTime threshold);
 }

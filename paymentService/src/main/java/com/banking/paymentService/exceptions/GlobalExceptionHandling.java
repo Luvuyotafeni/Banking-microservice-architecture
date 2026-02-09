@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class GlobalExceptionHandling {
 
-    @ExceptionHandler(TransactionNotFoundException.class){
-
-    }
+//    @ExceptionHandler(TransactionNotFoundException.class){
+//
+//    }
 }

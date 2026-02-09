@@ -5,8 +5,10 @@ import com.banking.paymentService.dto.request.UpdateTransactionStatusRequest;
 import com.banking.paymentService.dto.response.TransactionResponse;
 import com.banking.paymentService.service.TransactionService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -16,11 +18,12 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/admin")
-@RequiredArgsConstructor
-@Slf4j
+@AllArgsConstructor
 public class AdminTransactionController {
 
     private final TransactionService transactionService;
+
+    private static final Logger log = LoggerFactory.getLogger(AdminTransactionController.class);
 
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PutMapping("/{transactionId}/status")

@@ -11,14 +11,17 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.UUID;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class TransactionValidationService {
 
     private final TransactionLimitService transactionLimitService;
+
+    private static final Logger log = LoggerFactory.getLogger(TransactionValidationService.class);
 
     @Value("${payment.limits.max-transfer-amount}")
     private BigDecimal maxTransferAmount;
