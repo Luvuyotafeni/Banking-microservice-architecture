@@ -7,6 +7,7 @@ import com.banking.usermanagementservice.enums.ApprovalStatus;
 import com.banking.usermanagementservice.exception.InvalidOperationException;
 import com.banking.usermanagementservice.exception.ResourceNotFoundException;
 import com.banking.usermanagementservice.mapper.UserMapper;
+import com.banking.usermanagementservice.messaging.UserManagementEventProducer;
 import com.banking.usermanagementservice.repository.UserRepository;
 import com.banking.usermanagementservice.service.EmailService;
 import com.banking.usermanagementservice.service.OtpService;
@@ -30,6 +31,7 @@ public class UserApprovalServiceImpl implements UserApprovalService {
     private final UserMapper userMapper;
     private final EmailService emailService;
     private final OtpService otpService;
+    private final UserManagementEventProducer eventProducer;
 
     @Override
     @Transactional
@@ -39,7 +41,6 @@ public class UserApprovalServiceImpl implements UserApprovalService {
         User user = userRepository.findByIdAndNotDeleted((request.getUserId()))
                 .orElseThrow(()-> new ResourceNotFoundException("User not found"));
 
-        //check if user is in pending status
         if (user.getApprovalStatus() != ApprovalStatus.PENDING){
             throw new InvalidOperationException("User approval status is already: "+ user.getApprovalStatus());
         }
@@ -50,13 +51,9 @@ public class UserApprovalServiceImpl implements UserApprovalService {
             user.setApprovedBy(approvedBy);
             user.setActive(true);
 
-            //generation of the otp
             String otp = otpService.generateOtp(user.getId());
 
-            //save user
             User approvedUser = userRepository.save(user);
-
-            //send approval email with the otp
 
             emailService.sendApprovalEmail(
                     approvedUser.getEmail(),
@@ -64,7 +61,10 @@ public class UserApprovalServiceImpl implements UserApprovalService {
                     otp
             );
 
-            log.info("User approved successfully: {}", user.getId());
+            // Publish Kafka event - User Approved
+            eventProducer.publishUserUpdatedEvent(approvedUser);
+
+            log.info("User approved successfully: {}. Event published to Kafka.", user.getId());
             return userMapper.toUserResponse(approvedUser);
 
         } else {
@@ -72,10 +72,8 @@ public class UserApprovalServiceImpl implements UserApprovalService {
             user.setApprovedAt(LocalDateTime.now());
             user.setApprovedBy(approvedBy);
 
-            //save user
             User rejectedUser = userRepository.save(user);
 
-            //send rejection email
             emailService.sendRejectionEmail(
                     rejectedUser.getEmail(),
                     rejectedUser.getFullName(),
@@ -85,7 +83,6 @@ public class UserApprovalServiceImpl implements UserApprovalService {
             log.info("User rejected: {}", user.getId());
             return userMapper.toUserResponse(rejectedUser);
         }
-
     }
 
     @Override
@@ -109,6 +106,5 @@ public class UserApprovalServiceImpl implements UserApprovalService {
                 .orElseThrow(()-> new ResourceNotFoundException("User not found"));
 
         return userMapper.toUserResponse(user);
-
     }
 }

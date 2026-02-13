@@ -3,9 +3,9 @@ package com.banking.usermanagementservice.service.serviceImpl;
 import com.banking.usermanagementservice.dto.UserResponse;
 import com.banking.usermanagementservice.dto.UserSuspensionRequest;
 import com.banking.usermanagementservice.entity.User;
-import com.banking.usermanagementservice.enums.ApprovalStatus;
 import com.banking.usermanagementservice.exception.ResourceNotFoundException;
 import com.banking.usermanagementservice.mapper.UserMapper;
+import com.banking.usermanagementservice.messaging.UserManagementEventProducer;
 import com.banking.usermanagementservice.repository.UserRepository;
 import com.banking.usermanagementservice.service.UserManagementService;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +25,13 @@ public class UserManagementServiceImpl implements UserManagementService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final UserManagementEventProducer eventProducer;
 
     @Override
     @Transactional
     public UserResponse suspendUser(UserSuspensionRequest request, UUID adminId) {
-        log.info("Processing suspension request for user: {} by admin: {}", request.getUserId(), adminId
-        );
+        log.info("Processing suspension request for user: {} by admin: {}",
+                request.getUserId(), adminId);
 
         User user = userRepository.findByIdAndNotDeleted(request.getUserId())
                 .orElseThrow(()-> new ResourceNotFoundException("User not found"));
@@ -42,27 +43,34 @@ public class UserManagementServiceImpl implements UserManagementService {
             user.setActive(false);
 
             log.info("User {} suspended by admin: {}", user.getId(), adminId);
-
         } else {
             user.setSuspended(false);
             user.setSuspensionReason(null);
             user.setSuspendedAt(null);
             user.setActive(true);
 
-            log.info("user {} unsuspended by admin: {}", user.getId(), adminId);
+            log.info("User {} unsuspended by admin: {}", user.getId(), adminId);
         }
 
         User updatedUser = userRepository.save(user);
 
+        // Publish Kafka event - User Suspended/Unsuspended
+        eventProducer.publishUserSuspendedEvent(
+                updatedUser,
+                request.getSuspend(),
+                request.getReason(),
+                adminId
+        );
+
+        log.info("User suspension status updated. Event published to Kafka.");
+
         return userMapper.toUserResponse(updatedUser);
-
-
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<UserResponse> getAllActiveUsers() {
-        log.info("fetching all active users");
+        log.info("Fetching all active users");
 
         List<User> activeUser = userRepository.findAll().stream()
                 .filter(user -> !user.isDeleted() && user.isActive() && !user.isSuspended())
@@ -90,7 +98,6 @@ public class UserManagementServiceImpl implements UserManagementService {
     @Override
     @Transactional
     public void deleteUser(UUID userId, UUID adminId) {
-
         log.info("Permanently deleting user: {} by admin {}", userId, adminId);
 
         User user = userRepository.findByIdAndNotDeleted(userId)
@@ -101,6 +108,7 @@ public class UserManagementServiceImpl implements UserManagementService {
         user.setActive(false);
 
         userRepository.save(user);
+
         log.info("User {} soft deleted by admin: {}", userId, adminId);
     }
 }

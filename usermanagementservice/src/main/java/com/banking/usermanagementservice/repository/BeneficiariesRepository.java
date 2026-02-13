@@ -18,7 +18,7 @@ public interface BeneficiariesRepository extends JpaRepository<Beneficiaries, UU
     List<Beneficiaries> findByIsActive(boolean isActive);
 
     @Query("SELECT b FROM Beneficiaries b JOIN b.users u WHERE u.id = :userId AND b.isActive = true")
-    List<Beneficiaries> findActiveByUserId(@Param("userOd") UUID userId);
+    List<Beneficiaries> findActiveByUserId(@Param("userId") UUID userId);
 
     @Query("SELECT b FROM Beneficiaries b JOIN b.users u WHERE u.id = :userId")
     List<Beneficiaries> findAllByUserId(@Param("userId") UUID userId);

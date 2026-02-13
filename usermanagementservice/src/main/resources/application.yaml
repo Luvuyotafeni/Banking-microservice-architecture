@@ -2,25 +2,35 @@ spring:
   application:
     name: usermanagementservice
 
-    datasource:
-      url: dbc:mysql://localhost:3306/fnb_intelligent_bank_usermanagement
-      username: root
-      password: 1234
-      driver-class-name: com.mysql.cj.jdbc.Driver
+  datasource:
+    url: jdbc:mysql://localhost:3306/fnb_intelligent_bank_usermanagement
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
-
-    jpa:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
       hibernate:
-        ddl-auto: update
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: payment-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        hibernate:
-          dialect: org.hibernate.dialect.MySQLDialect
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: "*"
 
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
     username: ${MAIL_USERNAME:}
-    password: ${MAIL_PASWORD:}
+    password: ${MAIL_PASSWORD:}
     properties:
       mail:
         smtp:

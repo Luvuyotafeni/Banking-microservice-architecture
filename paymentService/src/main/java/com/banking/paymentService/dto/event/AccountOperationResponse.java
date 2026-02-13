@@ -1,7 +1,7 @@
 package com.banking.paymentService.dto.event;
 
 import lombok.*;
-import org.hibernate.validator.constraints.UUID;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

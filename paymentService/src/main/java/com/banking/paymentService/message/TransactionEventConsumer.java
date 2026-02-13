@@ -22,7 +22,7 @@ public class TransactionEventConsumer {
     private final TransactionRepository transactionRepository;
     private final ObjectMapper objectMapper;
 
-    @KafkaListener(topics = KafkaTopicConfig.BALANCE_CHECK_RESPONSE, groupId = "${spring.kafka.comnsumer.groupp-id}")
+    @KafkaListener(topics = KafkaTopicConfig.BALANCE_CHECK_RESPONSE, groupId = "${spring.kafka.consumer.group-id}")
     public void consumeBalanceCheckResponse(String message){
         try{
             BalanceCheckResponse response = objectMapper.readValue(message, BalanceCheckResponse.class);
@@ -47,7 +47,7 @@ public class TransactionEventConsumer {
         }
     }
 
-    @KafkaListener(topics = KafkaTopicConfig.ACCOUNT_OPERATION_RESPONSE, groupId = "${sprng.kafka.consumer.group-id}")
+    @KafkaListener(topics = KafkaTopicConfig.ACCOUNT_OPERATION_RESPONSE, groupId = "${spring.kafka.consumer.group-id}")
     public void consumeAccountOperationResponse(String message){
         try {
             AccountOperationResponse response = objectMapper.readValue(

@@ -8,6 +8,7 @@ import com.banking.usermanagementservice.entity.User;
 import com.banking.usermanagementservice.exception.BeneficiaryAlreadyExistsException;
 import com.banking.usermanagementservice.exception.BeneficiaryNotFoundException;
 import com.banking.usermanagementservice.exception.ResourceNotFoundException;
+import com.banking.usermanagementservice.messaging.UserManagementEventProducer;
 import com.banking.usermanagementservice.repository.BeneficiariesRepository;
 import com.banking.usermanagementservice.repository.UserRepository;
 import com.banking.usermanagementservice.service.BeneficiariesService;
@@ -27,6 +28,7 @@ public class BeneficiaryServiceImpl implements BeneficiariesService {
 
     private final UserRepository userRepository;
     private final BeneficiariesRepository beneficiariesRepository;
+    private final UserManagementEventProducer eventProducer;
 
     @Override
     public BeneficiaryResponse createBeneficiaryForUser(UUID userId, CreateBeneficiaryRequest request) {
@@ -42,10 +44,14 @@ public class BeneficiaryServiceImpl implements BeneficiariesService {
             if (!user.getBeneficiaries().contains(existingBeneficiary)){
                 user.getBeneficiaries().add(existingBeneficiary);
                 userRepository.save(user);
-                log.info("Existing beneficiary {} associated with user {}", existingBeneficiary.getId(), userId);
+
+                // Publish Kafka event - Beneficiary Added
+                eventProducer.publishBeneficiaryAddedEvent(userId, existingBeneficiary);
+
+                log.info("Existing beneficiary {} associated with user {}. Event published to Kafka.",
+                        existingBeneficiary.getId(), userId);
             } else {
                 throw new BeneficiaryAlreadyExistsException("You already have this beneficiary in you beneficiaries");
-
             }
             return mapToResponse(existingBeneficiary);
         }
@@ -61,7 +67,11 @@ public class BeneficiaryServiceImpl implements BeneficiariesService {
         user.getBeneficiaries().add(savedBeneficiary);
         userRepository.save(user);
 
-        log.info("Beneficiary created and associated with user successfully with Id: {}", savedBeneficiary.getId());
+        // Publish Kafka event - Beneficiary Added
+        eventProducer.publishBeneficiaryAddedEvent(userId, savedBeneficiary);
+
+        log.info("Beneficiary created and associated with user successfully with Id: {}. Event published to Kafka.",
+                savedBeneficiary.getId());
         return mapToResponse(savedBeneficiary);
     }
 
@@ -103,7 +113,6 @@ public class BeneficiaryServiceImpl implements BeneficiariesService {
 
         if (!userRepository.existsById(userId)){
             throw new ResourceNotFoundException("User not found with Id: "+ userId);
-
         }
 
         return beneficiariesRepository.findAllByUserId(userId).stream()
@@ -155,7 +164,6 @@ public class BeneficiaryServiceImpl implements BeneficiariesService {
 
     @Override
     public void deleteBeneficiary(UUID beneficiaryId) {
-
         log.info("Soft deleting beneficiary with ID: {}", beneficiaryId);
 
         Beneficiaries beneficiary = beneficiariesRepository.findById(beneficiaryId)
@@ -164,12 +172,10 @@ public class BeneficiaryServiceImpl implements BeneficiariesService {
         beneficiary.setActive(false);
         beneficiariesRepository.save(beneficiary);
         log.info("Beneficiary soft deleted successfully with Id: {}", beneficiary);
-
     }
 
     @Override
     public void hardDeleteBeneficiary(UUID beneficiaryId) {
-
         log.info("Hard deleting beneficiary with id: {}", beneficiaryId);
 
         if (!beneficiariesRepository.existsById(beneficiaryId)){
@@ -192,15 +198,16 @@ public class BeneficiaryServiceImpl implements BeneficiariesService {
 
         if (user.getBeneficiaries().contains(beneficiaries)){
             log.warn("Beneficiary with id {} is already associated with user {}", beneficiaries, user);
-
             throw new BeneficiaryAlreadyExistsException("This beneficiary is already associated with the user");
         }
 
         user.getBeneficiaries().add(beneficiaries);
         userRepository.save(user);
 
-        log.info("beneficiary {} added to user {}  successfully", beneficiaryId, userId);
+        // Publish Kafka event - Beneficiary Added
+        eventProducer.publishBeneficiaryAddedEvent(userId, beneficiaries);
 
+        log.info("Beneficiary {} added to user {} successfully. Event published to Kafka.", beneficiaryId, userId);
     }
 
     @Override
@@ -219,7 +226,11 @@ public class BeneficiaryServiceImpl implements BeneficiariesService {
 
         user.getBeneficiaries().remove(beneficiary);
         userRepository.save(user);
-        log.info("Beneficiary {} removed from user {}", beneficiaryId, userId);
+
+        // Publish Kafka event - Beneficiary Removed
+        eventProducer.publishBeneficiaryRemovedEvent(userId, beneficiaryId);
+
+        log.info("Beneficiary {} removed from user {}. Event published to Kafka.", beneficiaryId, userId);
     }
 
     @Override
@@ -232,7 +243,6 @@ public class BeneficiaryServiceImpl implements BeneficiariesService {
     @Override
     @Transactional(readOnly = true)
     public void verifyBeneficiaryOwnership(UUID userId, UUID beneficiaryId) {
-
         log.info("Verifying beneficiary {} ownership for user {}", beneficiaryId, userId);
 
         if (!beneficiariesRepository.existsByIdAndUserId(beneficiaryId, userId)) {
@@ -249,7 +259,6 @@ public class BeneficiaryServiceImpl implements BeneficiariesService {
 
         return user.getId();
     }
-
 
     private BeneficiaryResponse mapToResponse(Beneficiaries beneficiary) {
         return BeneficiaryResponse.builder()
